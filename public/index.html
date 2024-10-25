@@ -48,7 +48,7 @@ document.getElementById('userMessage').addEventListener('keypress', (event) => {
 async function sendMessage() {
     const userMessageElement = document.getElementById('userMessage');
     const chatDiv = document.getElementById('chat');
-    const userMessage = userMessageElement.value.trim();
+    const userMessage = userMessageElement.value;
 
     if (userMessage === "") return; // Don't send empty messages
     userMessageElement.value = ''; // Clear input
