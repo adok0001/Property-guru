@@ -11,18 +11,29 @@ const WIT_TOKEN = process.env.WIT_TOKEN;
 app.post('/message', async (req, res) => {
   const userMessage = req.body.message;
   try {
+    // Send request to Wit.ai
     const response = await axios.get(`https://api.wit.ai/message?v=20230401&q=${encodeURIComponent(userMessage)}`, {
       headers: { Authorization: `Bearer ${WIT_TOKEN}` }
     });
-    const witResponse = response.data;
-    const reply = witResponse.text || "I'm sorry, I didn't understand that.";
+
+    // Extracting response from Wit.ai
+    const witData = response.data;
+    let reply;
+
+    // Check for intent or other relevant information in Wit.ai response
+    if (witData.entities && Object.keys(witData.entities).length > 0) {
+      const entityKey = Object.keys(witData.entities)[0];
+      reply = witData.entities[entityKey][0].value || "I'm sorry, I couldn't determine a response.";
+    } else {
+      reply = "I'm sorry, I didn't understand that.";
+    }
+
     res.json({ reply });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ reply: 'Something went wrong.' });
+    console.error('Error fetching data from Wit.ai:', error);
+    res.status(500).json({ reply: 'Something went wrong. Please try again later.' });
   }
 });
-
 
 app.use(express.static('public'));
 
