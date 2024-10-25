@@ -30,7 +30,10 @@ app.post('/message', async (req, res) => {
 
     res.json({ reply });
   } catch (error) {
-    console.error('Error fetching data from Wit.ai:', error);
+    console.error('Error fetching data from Wit.ai:', error.message); // Log error details
+    if (error.response) {
+      console.error("Error response data:", error.response.data); // Log detailed error response if available
+    }
     res.status(500).json({ reply: 'Something went wrong. Please try again later.' });
   }
 });
