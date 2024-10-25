@@ -32,53 +32,51 @@
 </head>
 <body>
     <h1>Successpaddy</h1>
-    <div id="chat"></div>
-    <input type="text" id="userMessage" placeholder="Type your message here">
+    <div id="chat" role="log" aria-live="polite"></div>
+    <input type="text" id="userMessage" placeholder="Type your message here" aria-label="User message">
     <button id="sendMessage">Send</button>
 
     <script src="/index.js"></script>
     <script>
         document.getElementById('sendMessage').addEventListener('click', sendMessage);
-document.getElementById('userMessage').addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        sendMessage();
-    }
-});
-
-async function sendMessage() {
-    const userMessageElement = document.getElementById('userMessage');
-    const chatDiv = document.getElementById('chat');
-    const userMessage = userMessageElement.value;
-
-    if (userMessage === "") return; // Don't send empty messages
-    userMessageElement.value = ''; // Clear input
-
-    // Display user's message
-    chatDiv.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
-
-    try {
-        // Send message to backend
-        const response = await fetch('/message', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: userMessage })
+        document.getElementById('userMessage').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         });
 
-        // Parse and display bot's response
-        const data = await response.json();
-        chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> ${data.reply}</div>`;
-    } catch (error) {
-        console.error('Error communicating with server:', error);
-        chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> Something went wrong.</div>`;
-    }
+        async function sendMessage() {
+            const userMessageElement = document.getElementById('userMessage');
+            const chatDiv = document.getElementById('chat');
+            const userMessage = userMessageElement.value.trim();
 
-    // Scroll to the latest message
-    chatDiv.scrollTop = chatDiv.scrollHeight;
-}
+            if (!userMessage) return; // Don't send empty messages
+            userMessageElement.value = ''; // Clear input
 
+            // Display user's message
+            chatDiv.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
+
+            try {
+                // Send message to backend
+                const response = await fetch('/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: userMessage })
+                });
+
+                // Parse and display bot's response
+                const data = await response.json();
+                chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> ${data.reply}</div>`;
+            } catch (error) {
+                console.error('Error communicating with server:', error);
+                chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> Something went wrong.</div>`;
+            }
+
+            // Scroll to the latest message
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
     </script>
-    
 </body>
 </html>
