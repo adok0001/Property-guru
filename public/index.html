@@ -17,6 +17,7 @@
             margin-bottom: 20px;
             height: 300px;
             overflow-y: scroll;
+            background-color: #f9f9f9;
         }
         #userMessage {
             width: 80%;
@@ -34,15 +35,29 @@
     <div id="chat"></div>
     <input type="text" id="userMessage" placeholder="Type your message here">
     <button id="sendMessage">Send</button>
-<script>
-    document.getElementById('sendMessage').addEventListener('click', async () => {
-    const userMessage = document.getElementById('userMessage').value;
-    document.getElementById('userMessage').value = '';
 
+    <script src="/index.js"></script>
+    <script>
+        document.getElementById('sendMessage').addEventListener('click', sendMessage);
+document.getElementById('userMessage').addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+async function sendMessage() {
+    const userMessageElement = document.getElementById('userMessage');
     const chatDiv = document.getElementById('chat');
+    const userMessage = userMessageElement.value.trim();
+
+    if (userMessage === "") return; // Don't send empty messages
+    userMessageElement.value = ''; // Clear input
+
+    // Display user's message
     chatDiv.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
 
     try {
+        // Send message to backend
         const response = await fetch('/message', {
             method: 'POST',
             headers: {
@@ -50,17 +65,20 @@
             },
             body: JSON.stringify({ message: userMessage })
         });
+
+        // Parse and display bot's response
         const data = await response.json();
         chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> ${data.reply}</div>`;
     } catch (error) {
-        console.error(error);
+        console.error('Error communicating with server:', error);
         chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> Something went wrong.</div>`;
     }
 
+    // Scroll to the latest message
     chatDiv.scrollTop = chatDiv.scrollHeight;
-});
+}
 
-</script>
-<script src ='/index.js'></script>
+    </script>
+    
 </body>
 </html>
