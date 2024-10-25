@@ -36,35 +36,39 @@
     <button id="sendMessage">Send</button>
 
     <script>
-        const chatDiv = document.getElementById('chat');
-        const userMessageInput = document.getElementById('userMessage');
-        const sendMessageButton = document.getElementById('sendMessage');
+    const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+require('dotenv').config();
 
-        sendMessageButton.addEventListener('click', async () => {
-            const userMessage = userMessageInput.value;
-            appendMessage('User', userMessage);
+const app = express();
+app.use(bodyParser.json());
 
-            // Making an AJAX request to the PHP backend
-            const response = await fetch('/process.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: userMessage }),
-            });
+const WIT_TOKEN = process.env.WIT_TOKEN;
 
-            const data = await response.json();
-            appendMessage('Bot', data.reply);
+app.post('/message', async (req, res) => {
+  const userMessage = req.body.message;
+  try {
+    const response = await axios.get(`https://api.wit.ai/message?v=20230401&q=${encodeURIComponent(userMessage)}`, {
+      headers: { Authorization: `Bearer ${WIT_TOKEN}` }
+    });
+    const witResponse = response.data;
+    const reply = witResponse.text || "I'm sorry, I didn't understand that.";
+    res.json({ reply });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ reply: 'Something went wrong.' });
+  }
+});
 
-            userMessageInput.value = '';
-        });
+// Serve the frontend (if you're serving static files like HTML/CSS/JS from here)
+app.use(express.static('public'));
 
-        function appendMessage(sender, message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = `${sender}: ${message}`;
-            chatDiv.appendChild(messageDiv);
-            chatDiv.scrollTop = chatDiv.scrollHeight;
-        }
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
     </script>
 </body>
 </html>
