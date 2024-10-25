@@ -23,7 +23,32 @@ app.post('/message', async (req, res) => {
   }
 });
 
-// Serve the frontend (if you're serving static files like HTML/CSS/JS from here)
+document.getElementById('sendMessage').addEventListener('click', async () => {
+    const userMessage = document.getElementById('userMessage').value;
+    document.getElementById('userMessage').value = '';
+
+    const chatDiv = document.getElementById('chat');
+    chatDiv.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
+
+    try {
+        const response = await fetch('/message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: userMessage })
+        });
+        const data = await response.json();
+        chatDiv.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
+    } catch (error) {
+        console.error(error);
+        chatDiv.innerHTML += `<div><strong>Bot:</strong> Something went wrong.</div>`;
+    }
+
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+});
+
+
 app.use(express.static('public'));
 
 const PORT = process.env.PORT || 3000;
