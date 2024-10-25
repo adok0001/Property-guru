@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot with Wit.ai</title>
+    <title>Successpaddy</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,7 +30,7 @@
     </style>
 </head>
 <body>
-    <h1>Chatbot with Wit.ai</h1>
+    <h1>Successpaddy</h1>
     <div id="chat"></div>
     <input type="text" id="userMessage" placeholder="Type your message here">
     <button id="sendMessage">Send</button>
@@ -51,16 +51,16 @@
             body: JSON.stringify({ message: userMessage })
         });
         const data = await response.json();
-        chatDiv.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
+        chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> ${data.reply}</div>`;
     } catch (error) {
         console.error(error);
-        chatDiv.innerHTML += `<div><strong>Bot:</strong> Something went wrong.</div>`;
+        chatDiv.innerHTML += `<div><strong>Successpaddy:</strong> Something went wrong.</div>`;
     }
 
     chatDiv.scrollTop = chatDiv.scrollHeight;
 });
 
 </script>
-<script src ='index.js'></script>
+<script src ='/index.js'></script>
 </body>
 </html>
